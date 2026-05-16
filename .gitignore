@@ -4,7 +4,8 @@ venv/
 ENV/
 
 env/
-
+.vscode/
+.vs/
 # Python cache
 __pycache__/
 *.py[cod]
