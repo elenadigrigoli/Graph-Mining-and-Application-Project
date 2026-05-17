@@ -19,7 +19,7 @@ To use different explainers (GGNExplainers, MaskGraphExplainer), we relied on th
 
 Additionally, some explainers were custom-defined based on their respective papers, while others were imported from their official repositories.
 
-## DgraphFin Description
+## DGraphFin Description
 
 <div align="center">
   <img src="https://dgraph.xinye.com/static/img/new_diagram2.97eee42d.jpg">
@@ -115,9 +115,9 @@ model = GAT(
 
 ## Sources
 
-- [Huang et al., *DGraph: A Large-Scale Financial Dataset for Graph Anomaly Detection*, arXiv:2207.03579 (2022).](https://arxiv.org/abs/2207.03579)
-- [Amato et al., *GECo: a community-based graph neural network explainer*, Computing, 108(4), 55 (2026). Springer.](https://link.springer.com/article/10.1007/s00607-026-01642-z)
-- [Akkas, S., & Azad, A. (2024). GNNShap: Scalable and accurate GNN explanation using Shapley values. arXiv:2401.04829](https://arxiv.org/pdf/2401.04829)
+> 1. [Huang et al., *DGraph: A Large-Scale Financial Dataset for Graph Anomaly Detection*, arXiv:2207.03579 (2022).](https://arxiv.org/abs/2207.03579)
+> 2. [Amato et al., *GECo: a community-based graph neural network explainer*, Computing, 108(4), 55 (2026). Springer.](https://link.springer.com/article/10.1007/s00607-026-01642-z)
+> 3. [Akkas, S., & Azad, A. (2024). GNNShap: Scalable and accurate GNN explanation using Shapley values. arXiv:2401.04829](https://arxiv.org/pdf/2401.04829)
 
 
 
