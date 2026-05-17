@@ -15,8 +15,15 @@ log = get_logger(__name__)
 
 from torch.utils.cpp_extension import load
 
-cppsamp = load(name='cudaGNNShapSampler', sources=['cppextension/cudagnnshap.cu'],
-                   extra_cflags=['-O2'], verbose=False)
+try:
+    cppsamp = load(name='cudaGNNShapSampler', sources=['cppextension/cudagnnshap.cu'],
+                       extra_cflags=['-O2'], verbose=False)
+except RuntimeError as e:
+    if "Ninja is required" in str(e):
+        log.warning("CUDA extension not available (Ninja not installed). GNNShapSampler will not be available.")
+        cppsamp = None
+    else:
+        raise
 
 
 class GNNShapSampler(BaseSampler):
@@ -39,6 +46,10 @@ class GNNShapSampler(BaseSampler):
         self.num_threads = kwargs.get('num_threads', 128)
 
     def sample(self) -> Tuple[Tensor, Tensor]:
+        if cppsamp is None:
+            raise RuntimeError("GNNShapSampler requires CUDA compilation (Ninja build system). "
+                             "Use a different sampler like 'SVXSampler' or 'SHAPSampler' instead.")
+        
         mask_matrix = torch.zeros((self.nsamples, self.nplayers),
                                   dtype=torch.bool, requires_grad=False).cuda()
         kernel_weights = torch.zeros((self.nsamples), dtype=torch.float64,
