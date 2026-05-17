@@ -14,7 +14,10 @@
   </p>
 </div>
 
-This repository contains an analysis of several explanation methods applied to Graph Neural Networks, developed as a final project of the Graph Mining and Applications course at Sapienza University of Rome.
+This repository branch contains an analysis of several explanation methods applied to Graph Neural Networks for the fraud graph dataset [DGraphFin](https://arxiv.org/pdf/2207.03579), developed as a final project of the Graph Mining and Applications course at Sapienza University of Rome.
+To use different explainers (GGNExplainers, MaskGraphExplainer), we relied on the `torch.geometric` library.
+
+Additionally, some explainers were custom-defined based on their respective papers, while others were imported from their official repositories.
 
 ## Requirements
 
@@ -40,5 +43,70 @@ pip install -r requirement.txt
 
 - `OREExplainer.py`: Script with our custom implementation of the ORE (Optimized Rule Extraction) explainer adapted for Graph Neural Networks.
 
-- `utils_graph.py`: Utility functions for fidelity computation. 
+- `utils_graph.py`: Utility functions for fidelity computation.
+
+## Import and initialize models
+
+### Graph Convolutional Network
+
+```bash
+!git clone https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project.git
+
+from Model import GCN
+
+GCN_PARAMS = {
+    "hidden_channels": 64,
+    "dropout": 0.2,
+    "batchnorm": False,
+    "lr": 0.01,
+    "weight_decay": 5e-7,
+}
+
+# Initialize the GCN model
+model = GCN(
+    in_channels=graph_data.num_node_features,
+    hidden_channels=GCN_PARAMS["hidden_channels"],
+    out_channels=2,
+    dropout=GCN_PARAMS["dropout"],
+    batchnorm=GCN_PARAMS["batchnorm"],
+).to(device)
+```
+---
+
+### Graph Attention Network
+
+```bash
+!git clone https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project.git
+
+from Model import GAT
+
+GAT_PARAMS = {
+    "hidden_channels": 16,
+    "dropout": 0.2,
+    "batchnorm": False,
+    "lr": 0.01,
+    "weight_decay": 5e-7,
+    "number of heads": 2,
+}
+
+# Initialize the GAT model
+model = GAT(
+    in_channels=graph_data.num_node_features,
+    hidden_channels=GAT_PARAMS["hidden_channels"],
+    out_channels=2,
+    dropout=GAT_PARAMS["dropout"],
+    heads=GAT_PARAMS["number of heads"],
+).to(device)
+```
+
+
+
+
+
+
+
+
+
+
+
 
