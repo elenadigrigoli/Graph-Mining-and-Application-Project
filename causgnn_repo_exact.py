@@ -22,7 +22,7 @@ class CausGNN_RepoExact:
         node_scores = torch.zeros(num_nodes, dtype=torch.float32, device=self.device)
         edge_scores = torch.zeros(num_edges, dtype=torch.float32, device=self.device)
 
-        # 1. Probabilità Originale
+        # Original Prob
         with torch.no_grad():
             try:
                 orig_out = self.model(x, edge_index, batch=batch)
@@ -30,10 +30,10 @@ class CausGNN_RepoExact:
                 orig_out = self.model(x, edge_index, None, batch)
             orig_prob = F.softmax(orig_out, dim=-1)[0, target_class].item()
 
-        # 2. Causalità dei NODI (prob_drop azzerando il nodo)
+        # Nodes Causality
         for i in range(num_nodes):
             x_perturbed = x.clone()
-            x_perturbed[i] = 0.0 # Come nella repo: Intervento causale
+            x_perturbed[i] = 0.0 
 
             with torch.no_grad():
                 try:
@@ -45,7 +45,7 @@ class CausGNN_RepoExact:
             prob_drop = orig_prob - pert_prob
             node_scores[i] = max(0.0, prob_drop)
 
-        # 3. Causalità degli ARCHI (prob_drop rimuovendo l'arco)
+        # Edges Causality
         for j in range(num_edges):
             # Creiamo una maschera che tenga tutto tranne l'arco 'j'
             edge_mask_keep = torch.ones(num_edges, dtype=torch.bool, device=self.device)
@@ -64,7 +64,7 @@ class CausGNN_RepoExact:
             prob_drop = orig_prob - pert_prob
             edge_scores[j] = max(0.0, prob_drop)
 
-        # 4. Normalizzazione Min-Max [0, 1] per la suite di valutazione di B-XAIC
+        # Min-Max Norm
         if node_scores.max() > 0:
             node_scores = (node_scores - node_scores.min()) / (node_scores.max() - node_scores.min())
         if edge_scores.max() > 0:
