@@ -40,8 +40,8 @@ def args_parser():
     parser.add_argument("--readout", type=str, default="max", choices=["max", "sum", "mean"])
     parser.add_argument("--save_path", type=str, required=True)
     # --- MAX_EPOCHS + WARM_EPOCHS ---
-    parser.add_argument("--max_epochs", type=int, default=150, help="Numero massimo di epoche")
-    parser.add_argument("--warm_epochs", type=int, default=40, help="Epoche prima della proiezione")
+    parser.add_argument("--max_epochs", type=int, default=150, help="Max number of epochs")
+    parser.add_argument("--warm_epochs", type=int, default=40, help="Number of warm epochs")
     # -------------------------------------
     args = parser.parse_args()
     return args
@@ -86,14 +86,14 @@ def evaluate_GC(eval_dataloader, gnnNets, criterion):
         preds, ys = list(), list()
         for batch in eval_dataloader:
             logits, probs, _, _, _ = gnnNets(batch)
-            # --- INIZIO DEBUG ---
+            # --- FIX (START) ---
             if torch.isnan(logits).any():
                 print("ERRORE: I logit dal GIN sono NaN!")
                 break
             if torch.isnan(min_distances).any():
                 print("ERRORE: Le distanze min_distances sono NaN!")
                 break
-            # --- FINE DEBUG ---
+            # --- FIX (END) ---
             loss = criterion(logits, batch.y)
             preds.append(probs.argmax(-1).detach().cpu())
             ys.append(batch.y.detach().cpu())
