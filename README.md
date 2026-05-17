@@ -16,6 +16,14 @@
 
 This repository contains an analysis of several explanation methods applied to Graph Neural Networks, developed as a final project of the Graph Mining and Applications course at Sapienza University of Rome.
 
+## Requirements
+
+Install dependencies with:
+
+```bash
+pip install -r requirement.txt
+```
+
 ## Repository Structure 
 
 - `GNNShap`: [Modified version of Official epository](https://github.com/HipGraph/GNNShap) related to GNNShap s for explainability in Graph Neural Networks.
