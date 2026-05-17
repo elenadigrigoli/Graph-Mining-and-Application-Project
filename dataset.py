@@ -102,7 +102,7 @@ class XAIMolecularDataset(InMemoryDataset):
         data = self.data_lst[idx]
         return data
 
-    # FIX AGGIUNTO QUI: **kwargs assorbe 'old=True' o qualsiasi altra cosa extra senza crashare
+    # FIX HERE: **kwargs to not crash
     def get_splits(self, split_idx, **kwargs):
         splits = self.splits[f"split_{split_idx}"]
         idx = torch.arange(len(splits))
