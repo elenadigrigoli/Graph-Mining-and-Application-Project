@@ -223,7 +223,7 @@ def main():
         print(f"Saved to {args.save_path}")
         exit(0)
 
-    # --- INIZIO BLOCCO GECO (Incollalo qui sotto) ---
+    # --- GECO (START) ---
     elif args.explainer_type == "GECo":
         from geco_explainer import GECo
         print("\n[INFO] Avvio estrazione GECo (Community-based XAI)")
@@ -234,50 +234,43 @@ def main():
         for data in tqdm(dataset_test):
             data = data.to(device)
 
-            # 1. Calcoliamo la predizione come richiede la GIN
+            # Prediction (for GIN)
             batch = torch.zeros(data.x.shape[0], dtype=torch.long).to(device)
             try:
                  pred = model(data.x, data.edge_index, batch=batch)
             except TypeError:
                  pred = model(data.x, data.edge_index, data.edge_attr, batch)
 
-            # =================================================================
-            # LA MAGIA È QUI: Estraiamo la classe vincente (0 o 1) come numero
-            # intero puro, rimuovendolo dalla GPU. Questo rende felice GECo!
             target_class = pred.argmax(dim=-1).item()
-            # =================================================================
 
-           # 2. Estraiamo la comunità da GECo
+           # Extract community
             try:
                 raw_node_mask, _ = explainer.explain(data, target_class, False)
             except ValueError:
                 raw_node_mask = explainer.explain(data, target_class, False)
 
-           # =================================================================
-            # IL TRADUTTORE: Da "Comunità di GECo" a "Maschera Binaria di B-XAIC"
-            # =================================================================
+            # Translation for B-XAIC/GECO
             num_nodes = data.x.shape[0]
             node_mask_binary = torch.zeros(num_nodes, dtype=torch.float32)
 
             if raw_node_mask is not None:
-                # FIX: Se GECo restituisce un singolo numero (int), mettiamolo in una lista
+                # Another FIX: if we get a single number --> we take it into a list (...)
                 if isinstance(raw_node_mask, int):
                     raw_node_mask = [raw_node_mask]
 
-                # Ora possiamo tranquillamente usare len()
+                # (...) so here we can use len() without any errors
                 if len(raw_node_mask) > 0:
                     indices = torch.tensor(raw_node_mask, dtype=torch.long).cpu()
                     node_mask_binary[indices] = 1.0
-            # =================================================================
 
-            # 3. Impacchettiamo il tutto per il valutatore
+            # Let's put all together 
             expl = Data(
                 x=data.x.detach().cpu(),
                 edge_index=data.edge_index.detach().cpu(),
                 y=data.y.detach().cpu(),
                 pred=pred.detach().cpu(),
-                node_mask=node_mask_binary, # Usiamo la nostra maschera tradotta!
-                edge_mask=None,             # Ignoriamo gli archi per la valutazione sui nodi
+                node_mask=node_mask_binary, 
+                edge_mask=None,             
                 gt_node_mask=data.expl_node_mask.detach().cpu() if hasattr(data, "expl_node_mask") else None,
                 gt_edge_mask=data.expl_edge_mask.detach().cpu() if hasattr(data, "expl_edge_mask") else None,
             )
@@ -295,9 +288,10 @@ def main():
         )
         print(f"Saved to {args.save_path}")
         exit(0)
-    # --- FINE BLOCCO GECO ---
+    # --- GECO (END) ---
 
-    # --- INIZIO BLOCCO CausGNN (Fedele alla Repo GitHub) ---
+    # --- CausGNN (START) -------------------------
+    
     elif args.explainer_type == "CausGNN":
         from causgnn_repo_exact import CausGNN_RepoExact
         print("\n[INFO] Avvio estrazione CausGNN (Prob-Drop approach)")
@@ -316,7 +310,7 @@ def main():
 
             target_class = pred.argmax(dim=-1).item()
 
-            # Estraiamo i veri score causali di CausGNN
+            # causal scores extraction
             node_mask, edge_mask = explainer.explain(data, target_class)
 
             expl = Data(
@@ -325,7 +319,7 @@ def main():
                 y=data.y.detach().cpu(),
                 pred=pred.detach().cpu(),
                 node_mask=node_mask,
-                edge_mask=edge_mask,  # CausGNN qui offre info anche sugli archi!
+                edge_mask=edge_mask,  # with CausGNN we can also see what's happening in the edges
                 gt_node_mask=data.expl_node_mask.detach().cpu() if hasattr(data, "expl_node_mask") else None,
                 gt_edge_mask=data.expl_edge_mask.detach().cpu() if hasattr(data, "expl_edge_mask") else None,
             )
@@ -343,9 +337,9 @@ def main():
         )
         print(f"Saved to {args.save_path}")
         exit(0)
-    # --- FINE BLOCCO CausGNN ---
+    # --- CausGNN (END) ---------------------------
 
-    # --- INIZIO BLOCCO INTEGRATED GRADIENTS ---
+    # --- INTEGRATED GRADIENTS (START) ---
     elif args.explainer_type == "IntegratedGradients":
         from captum.attr import IntegratedGradients
         print("\n[INFO] Avvio estrazione Integrated Gradients (tramite Captum)")
@@ -355,7 +349,7 @@ def main():
             data = data.to(device)
             batch = torch.zeros(data.x.shape[0], dtype=torch.long).to(device)
 
-            # Predizione originale per capire quale classe spiegare
+            # Original pred
             with torch.no_grad():
                 try:
                     pred_orig = model(data.x, data.edge_index, batch=batch)
@@ -363,21 +357,21 @@ def main():
                     pred_orig = model(data.x, data.edge_index, getattr(data, 'edge_attr', None), batch)
             target_class = pred_orig.argmax(dim=-1).item()
 
-            # 1. NUOVO WRAPPER: Gestisce i batch generati da Captum per PyTorch Geometric
+            # FIX: Pytorch Geometric and Captum
             def model_forward(inputs_3d):
-                # inputs_3d arriva da Captum con forma: (batch_size, num_nodi, num_features)
+                # inputs_3d goes to captum like this: (batch_size, num_nodi, num_features)
                 bs, n_nodes, n_features = inputs_3d.shape
 
-                # Appiattiamo i nodi come vuole PyG -> (batch_size * num_nodi, num_features)
+                # PyG wants nodes like this: (batch_size * num_nodi, num_features)
                 x_flat = inputs_3d.view(-1, n_features)
 
-                # Moltiplichiamo edge_index spostando gli indici per ogni copia del grafo
+                # Multiply edge_index
                 edge_indices = []
                 for i in range(bs):
                     edge_indices.append(data.edge_index + i * n_nodes)
                 batched_edge_index = torch.cat(edge_indices, dim=1)
 
-                # Creiamo il vettore batch fittizio
+                # batched_batch vector
                 batched_batch = torch.arange(bs, device=inputs_3d.device).repeat_interleave(n_nodes)
 
                 # Forward pass
@@ -385,33 +379,31 @@ def main():
                     return model(x_flat, batched_edge_index, batch=batched_batch)
                 except TypeError:
                     if hasattr(data, 'edge_attr') and data.edge_attr is not None:
-                        # Gestione attributi archi per GAT
                         batched_edge_attr = data.edge_attr.repeat(bs, 1) if data.edge_attr.dim() > 1 else data.edge_attr.repeat(bs)
                         return model(x_flat, batched_edge_index, batched_edge_attr, batched_batch)
                     else:
                         return model(x_flat, batched_edge_index, None, batched_batch)
 
-            # Inizializziamo l'explainer col nuovo wrapper
+            # Explainer Initialization
             ig_explainer = IntegratedGradients(model_forward)
 
-            # 2. Aggiungiamo una dimensione finta all'input per far capire a Captum che è UN solo grafo
-            # Da (N, F) diventa (1, N, F)
+            # Another FIX: problems with captum
+            # From (N, F) become (1, N, F)
             inputs = data.x.clone().detach().float().requires_grad_(True).unsqueeze(0)
 
-            # 3. Calcolo di IG (Ora non passiamo più additional_forward_args, fa tutto il wrapper)
+            # IG
             attributions, delta = ig_explainer.attribute(
                 inputs=inputs,
                 target=target_class,
                 return_convergence_delta=True
             )
 
-            # 4. Rimuoviamo la dimensione finta: da (1, N, F) ritorniamo a (N, F)
+            # let's go back from (1, N, F) to (N, F)
             attributions = attributions.squeeze(0)
 
-            # Compressione a singolo punteggio per nodo
             node_mask = attributions.abs().sum(dim=1).detach().cpu()
 
-            # Normalizzazione
+            # Normalization
             if node_mask.max() > 0:
                 node_mask = (node_mask - node_mask.min()) / (node_mask.max() - node_mask.min())
 
@@ -439,7 +431,7 @@ def main():
         )
         print(f"Saved to {args.save_path}")
         exit(0)
-    # --- FINE BLOCCO INTEGRATED GRADIENTS ---
+    # --- INTEGRATED GRADIENTS (END) ---
 
 
 
