@@ -9,8 +9,7 @@ class CausGNN_RepoExact:
 
     def explain(self, data, target_class):
         """
-        Riproduce fedelmente la metrica 'prob_drop' usata nella repo ufficiale
-        di CausGNN per valutare la causalità di nodi e archi.
+        CausGNN replica from original paper
         """
         x = data.x
         edge_index = data.edge_index
@@ -47,7 +46,7 @@ class CausGNN_RepoExact:
 
         # Edges Causality
         for j in range(num_edges):
-            # Creiamo una maschera che tenga tutto tranne l'arco 'j'
+            # mask (except edge j)
             edge_mask_keep = torch.ones(num_edges, dtype=torch.bool, device=self.device)
             edge_mask_keep[j] = False
             modified_edge_index = edge_index[:, edge_mask_keep]
@@ -56,7 +55,7 @@ class CausGNN_RepoExact:
                 try:
                     pert_out = self.model(x, modified_edge_index, batch=batch)
                 except TypeError:
-                    # Gestione di eventuale edge_attr
+                    # edge_attr
                     mod_attr = data.edge_attr[edge_mask_keep] if hasattr(data, 'edge_attr') and data.edge_attr is not None else None
                     pert_out = self.model(x, modified_edge_index, mod_attr, batch)
                 pert_prob = F.softmax(pert_out, dim=-1)[0, target_class].item()
