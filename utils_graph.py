@@ -45,10 +45,6 @@ def compute_fidelity(explanation, model, sub_x, sub_edge_index, target_sub_idx, 
 
     return base_score_ig, keep_score_ig, deletion_score_ig, important_nodes_ig
 
-def sparsity(explanation, sub_x):
-    node_mask = explanation.node_mask.mean(dim=-1).cpu()
-    return float((node_mask < 0.5).sum()) / sub_x.size(0)
-
 def compute_base_score(model, x, edge_index, target_idx, target_class=1):
     model.eval()
 
