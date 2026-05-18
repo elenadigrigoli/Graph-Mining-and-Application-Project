@@ -57,7 +57,7 @@ pip install -r requirement.txt
 
 - `OREExplainer.py`: Script with our custom implementation of the ORE (Optimized Rule Extraction) explainer adapted for Graph Neural Networks.
 
-- `utils_graph.py`: Utility functions for fidelity computation.
+- `utils_graph.py`: Utility functions for explanation evaluation, including keep/deletion fidelity.
 
 ## Import and initialize models
 
