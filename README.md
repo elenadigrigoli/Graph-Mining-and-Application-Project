@@ -31,25 +31,11 @@ The main goal of this project is to study the interpretability of Graph Neural N
 The repository is divided into two different branches. In the first branch, called [**DGraphFin**](https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project/tree/DGraphFin), you can find our implementation for the fraud graph DGraphFin.
 In the second branch, called [**B-XAIC**](https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project/tree/B-XAIC), you can find our implementation for the molecular graph dataset B-XAIC.
 
-```bash
-git clone https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project.git
-# Switch to DGraphFin branch
-git checkout DGraphFin
-```
-
 ## DGraphFin Description
 
 <div align="center">
   <img src="https://dgraph.xinye.com/static/img/new_diagram2.97eee42d.jpg">
 </div>
-
-### How to Use
-
-```bash
-git clone https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project.git
-# Switch to B-XAIC branch
-git checkout B-XAIC
-```
 
 DGraphFin is a directed, unweighted dynamic graph consisting of millions of nodes and edges, representing a realistic user-to-user social network in the financial industry. Each node represents a Finvolution user, and an edge from one user to another indicates that the user has listed the other as an emergency contact. Each edge is associated with a timestamp ranging from 1 to 821 and an emergency contact type ranging from 0 to 11.
 
@@ -59,9 +45,27 @@ DGraphFin is a directed, unweighted dynamic graph consisting of millions of node
 |:--------------:|:--------------:|:-----------------:|:----------------:|
 | 4,300,999      | 3,700,550      | 17                | 2                |
 
+### How to use
+
+```bash
+git clone https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project.git
+
+# Switch to DGraphFin branch
+git checkout DGraphFin
+```
+
 ## B-XAIC Description
 
 B-XAIC (Benchmark for eXplainable AI in Chemistry) consists of real-world chemical graphs (~50K molecules) and multiple tasks with ground-truth explanations, enabling direct and reliable assessment of explanation quality. It provides a standardized framework to measure both predictive performance and the faithfulness of explanations, supporting the development of more interpretable and trustworthy GNN models in applications such as drug discovery and cheminformatics.
+
+### How to use
+
+```bash
+git clone https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project.git
+
+# Switch to B-XAIC branch
+git checkout B-XAIC
+```
 
 ## Sources
 
