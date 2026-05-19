@@ -31,6 +31,8 @@ The main goal of this project is to study the interpretability of Graph Neural N
 The repository is divided into two different branches. In the first branch, called [**DGraphFin**](https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project/tree/DGraphFin), you can find our implementation for the fraud graph DGraphFin.
 In the second branch, called [**B-XAIC**](https://github.com/elenadigrigoli/Graph-Mining-and-Application-Project/tree/B-XAIC), you can find our implementation for the molecular graph dataset B-XAIC.
 
+**Note**: For more details about the code, view the specific branch.
+
 ## DGraphFin Description
 
 <div align="center">
