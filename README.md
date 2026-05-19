@@ -43,7 +43,7 @@ DGraphFin is a directed, unweighted dynamic graph consisting of millions of node
 
 | Number of nodes | Number of edges | Number of features | Number of classes |
 |:--------------:|:--------------:|:-----------------:|:----------------:|
-| 4,300,999      | 3,700,550      | 17                | 2                |
+| 3,700,550      |  4,300,999     | 17                | 4               |
 
 ### How to use
 
