@@ -31,7 +31,7 @@ It is a directed, unweighted dynamic graph consisting of millions of nodes and e
 
 | Number of nodes      |    Number of edges     |  Number of features      |    Number of classes     | 
 |:-------:|:-------:|:-------:|:-------:| 
-|4,300,999| 3,700,550| 17 | 2| 
+|3,700,550| 4,300,999| 17 | 2| 
  
 ## Requirements
 
